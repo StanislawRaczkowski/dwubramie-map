@@ -22,21 +22,15 @@
   <script>
     const W = 2000, H = 1500;
 
-    // Inicjujemy mapę
     const map = L.map('map', {
       crs: L.CRS.Simple,
       maxBounds: [[0, 0], [H, W]],
       maxBoundsViscosity: 1
     });
 
-    // Dodajemy obraz
     L.imageOverlay('Dwubramie.png', [[0, 0], [H, W]]).addTo(map);
-
-    // Dopasowujemy widok
     map.fitBounds([[0, 0], [H, W]]);
 
-    // Ustawiamy zoom: minimalny zoom to ten, który powoduje, że obraz wypełnia całą widoczną część mapy,
-    // maksymalny - arbitralny (np 2)
     const mapContainer = document.getElementById('map');
     const minZoom = Math.min(
       Math.log2(mapContainer.clientWidth / W),
@@ -45,13 +39,9 @@
     map.setMinZoom(minZoom);
     map.setMaxZoom(2);
 
-    // Filtrowanie pustych współrzędnych w polygonie
     function cleanPolygonString(raw) {
       try {
-        // Spróbuj sparsować jako JSON
         let arr = JSON.parse(raw);
-
-        // Filtruj tylko te elementy, które są tablicą dwóch liczb
         arr = arr.filter(coord =>
           Array.isArray(coord) &&
           coord.length === 2 &&
@@ -71,39 +61,33 @@
       .then(csv => {
         const parsed = Papa.parse(csv, { header: true, skipEmptyLines: true });
         const rows = parsed.data;
-        console.log(`Wczytano ${rows.length} wierszy`);
 
         rows.forEach((row, idx) => {
           const id = row.ID || row.id;
           const raw = row.polygon || row.Polygon || row.POLYGON;
 
-          if (!id) {
-            console.warn(`Wiersz ${idx} - brak ID, pomijam`);
-            return;
-          }
-          if (!raw) {
-            console.warn(`Wiersz ${idx} - brak polygon, pomijam`);
-            return;
-          }
+          if (!id || !raw) return;
 
           let coords = cleanPolygonString(raw);
-          if (!coords || coords.length === 0) {
-            console.warn(`Wiersz ${idx} - polygon jest pusty lub niepoprawny`);
-            return;
-          }
+          if (!coords || coords.length === 0) return;
 
-          // Zamiana współrzędnych [x,y] na [y,x] dla Leaflet
           coords = coords.map(([x, y]) => [y, x]);
-
-          console.log(`Dodaję polygon ID: ${id}`);
 
           const poly = L.polygon(coords, {
             color: '#333',
             fillColor: '#ccc',
-            fillOpacity: 0.5
+            fillOpacity: 0,    // domyślnie wypełnienie niewidoczne
+            weight: 2,
+            interactive: true
           }).addTo(map);
 
-          // Tooltip bez kolumn polygon i polygon_function:
+          poly.on('mouseover', () => {
+            poly.setStyle({ fillOpacity: 0.5 });
+          });
+          poly.on('mouseout', () => {
+            poly.setStyle({ fillOpacity: 0 });
+          });
+
           const info = [`<strong>${id}</strong>`];
           Object.entries(row).forEach(([k, v]) => {
             if (!v) return;
