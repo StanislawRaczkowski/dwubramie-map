@@ -5,7 +5,12 @@
   <title>Mapa Dwubramie</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style> 
-    html, body, #map { height: 100%; margin: 0; } 
+    html, body, #map { 
+      height: 100%; 
+      margin: 0; 
+      padding: 0; 
+      overflow: hidden;
+    } 
   </style>
 </head>
 <body>
@@ -16,7 +21,16 @@
 
   <script>
     const W = 2000, H = 1500;
-    const map = L.map('map', { crs: L.CRS.Simple, minZoom: -2 });
+
+    const map = L.map('map', {
+      crs: L.CRS.Simple,
+      minZoom: -2,
+      maxZoom: 0,
+      maxBounds: [[0,0], [H,W]],
+      maxBoundsViscosity: 1
+    });
+
+    // Tu zmieniamy na svg
     L.imageOverlay('Dwubramie.svg', [[0,0],[H,W]]).addTo(map);
     map.fitBounds([[0,0],[H,W]]);
 
@@ -31,7 +45,6 @@
         console.log(`Wczytano ${rows.length} wierszy`);
 
         rows.forEach((row, idx) => {
-          // loguj klucze aby sprawdzić nazwy kolumn
           if (idx === 0) {
             console.log('Kolumny:', Object.keys(row));
           }
@@ -61,11 +74,12 @@
             return;
           }
 
+          console.log(`Dodaję polygon ID: ${id}`);
+
           const poly = L.polygon(coords, {
             color: '#333', fillColor: '#ccc', fillOpacity: 0.5
           }).addTo(map);
 
-          // W tooltip pomijaj wszystkie klucze zawierające "polygon" lub "polygon_function" (case insensitive)
           const info = [`<strong>${id}</strong>`];
           Object.entries(row).forEach(([k, v]) => {
             if (!v) return;
