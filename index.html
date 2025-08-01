@@ -43,3 +43,21 @@
         }
         catch (e) { 
           console.warn(`Invalid polygon for id ${id}`, e);
+          return; 
+        }
+
+        const poly = L.polygon(coords, {
+          color: '#333', fillColor: '#ccc', fillOpacity: 0.5
+        }).addTo(map);
+
+        const info = [`<strong>${id}</strong>`];
+        Object.entries(row).forEach(([k, v]) => {
+          if (k.toLowerCase() === "id" || k.toLowerCase() === "polygon") return;
+          info.push(`${k}: ${v}`);
+        });
+        poly.bindTooltip(info.join('<br>'), { sticky: true });
+      });
+    }
+  </script>
+</body>
+</html>
