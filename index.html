@@ -7,6 +7,7 @@
   <style>
     html, body, #map {
       height: 100%;
+      width: 100%;
       margin: 0; padding: 0;
       overflow: hidden;
     }
@@ -21,16 +22,19 @@
   <script>
     const W = 2000, H = 1500;
 
+    // Tworzymy mapę z własnym CRS i ograniczeniami:
     const map = L.map('map', {
       crs: L.CRS.Simple,
       minZoom: -2,
-      maxZoom: 0,
-      maxBounds: [[0, 0], [H, W]],
-      maxBoundsViscosity: 1
+      maxZoom: 2,
+      maxBounds: [[0, 0], [H, W]],    // granice mapy - ograniczenie przesuwania
+      maxBoundsViscosity: 1            // blokuje wyjechanie poza bounds
     });
 
-    // Wracamy do PNG
+    // Dodajemy obraz jako overlay:
     L.imageOverlay('Dwubramie.png', [[0, 0], [H, W]]).addTo(map);
+
+    // Ustawiamy widok tak, żeby obraz wypełniał ekran:
     map.fitBounds([[0, 0], [H, W]]);
 
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRANJvh0npIT9SY2a4yXEMvYrB0snebe2ZjwBJ58hKEEy-jwh04M7MR-cN60P_krDUEOiNvma9IaHxM/pub?output=csv";
@@ -76,7 +80,7 @@
             fillOpacity: 0.5
           }).addTo(map);
 
-          // Tworzymy tooltip bez kolumn polygon i polygon_function
+          // Tooltip bez kolumn polygon i polygon_function:
           const info = [`<strong>${id}</strong>`];
           Object.entries(row).forEach(([k, v]) => {
             if (!v) return;
