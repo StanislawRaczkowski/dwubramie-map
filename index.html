@@ -4,13 +4,12 @@
   <meta charset="utf-8" />
   <title>Mapa Dwubramie</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <style> 
-    html, body, #map { 
-      height: 100%; 
-      margin: 0; 
-      padding: 0; 
+  <style>
+    html, body, #map {
+      height: 100%;
+      margin: 0; padding: 0;
       overflow: hidden;
-    } 
+    }
   </style>
 </head>
 <body>
@@ -26,29 +25,24 @@
       crs: L.CRS.Simple,
       minZoom: -2,
       maxZoom: 0,
-      maxBounds: [[0,0], [H,W]],
+      maxBounds: [[0, 0], [H, W]],
       maxBoundsViscosity: 1
     });
 
-    // Tu zmieniamy na svg
-    L.imageOverlay('Dwubramie.svg', [[0,0],[H,W]]).addTo(map);
-    map.fitBounds([[0,0],[H,W]]);
+    // Wracamy do PNG
+    L.imageOverlay('Dwubramie.png', [[0, 0], [H, W]]).addTo(map);
+    map.fitBounds([[0, 0], [H, W]]);
 
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRANJvh0npIT9SY2a4yXEMvYrB0snebe2ZjwBJ58hKEEy-jwh04M7MR-cN60P_krDUEOiNvma9IaHxM/pub?output=csv";
 
     fetch(CSV_URL)
       .then(r => r.text())
       .then(csv => {
-        const parsed = Papa.parse(csv, { header: true });
+        const parsed = Papa.parse(csv, { header: true, skipEmptyLines: true });
         const rows = parsed.data;
-
         console.log(`Wczytano ${rows.length} wierszy`);
 
         rows.forEach((row, idx) => {
-          if (idx === 0) {
-            console.log('Kolumny:', Object.keys(row));
-          }
-
           const id = row.ID || row.id;
           const raw = row.polygon || row.Polygon || row.POLYGON;
 
@@ -69,7 +63,7 @@
               return;
             }
             coords = coords.map(([x, y]) => [y, x]);
-          } catch(e) {
+          } catch (e) {
             console.warn(`Wiersz ${idx} - błąd parsowania polygon:`, e);
             return;
           }
@@ -77,15 +71,18 @@
           console.log(`Dodaję polygon ID: ${id}`);
 
           const poly = L.polygon(coords, {
-            color: '#333', fillColor: '#ccc', fillOpacity: 0.5
+            color: '#333',
+            fillColor: '#ccc',
+            fillOpacity: 0.5
           }).addTo(map);
 
+          // Tworzymy tooltip bez kolumn polygon i polygon_function
           const info = [`<strong>${id}</strong>`];
           Object.entries(row).forEach(([k, v]) => {
             if (!v) return;
             const keyLower = k.toLowerCase();
-            if (keyLower.includes('polygon')) return;
             if (keyLower === 'id') return;
+            if (keyLower.includes('polygon')) return;
             info.push(`${k}: ${v}`);
           });
           poly.bindTooltip(info.join('<br>'), { sticky: true });
