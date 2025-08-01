@@ -15,7 +15,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
   <script>
-    const W = 2000, H = 1500;  // dostosuj do mapy
+    const W = 2000, H = 1500;
     const map = L.map('map', { crs: L.CRS.Simple, minZoom: -2 });
     L.imageOverlay('Dwubramie.jpg', [[0,0],[H,W]]).addTo(map);
     map.fitBounds([[0,0],[H,W]]);
@@ -26,24 +26,29 @@
       .then(r => r.text())
       .then(csv => {
         const rows = Papa.parse(csv, { header: true }).data;
+
         rows.forEach(row => {
           const id = row.ID || row.id;
           const raw = row.polygon;
           if (!id || !raw) return;
+
           let coords;
           try {
             coords = JSON.parse(raw).map(([x, y]) => [y, x]);
           } catch(e) {
-            console.error('Błąd parsowania polygonu dla ID:', id, e);
+            console.warn('Błąd parsowania polygonu dla ID:', id, e);
             return;
           }
+
           const poly = L.polygon(coords, {
             color: '#333', fillColor: '#ccc', fillOpacity: 0.5
           }).addTo(map);
 
+          // Ukryj pola polygon i polygon_function w tooltipie
           const info = [`<strong>${id}</strong>`];
           Object.entries(row).forEach(([k,v]) => {
-            if (k.toLowerCase() === "id" || k.toLowerCase() === "polygon") return;
+            const key = k.toLowerCase();
+            if (key === "id" || key === "polygon" || key === "polygon_function") return;
             info.push(`${k}: ${v}`);
           });
           poly.bindTooltip(info.join('<br>'), { sticky: true });
