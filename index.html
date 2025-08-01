@@ -74,25 +74,22 @@
           coords = coords.map(([x, y]) => [y, x]);
 
           const poly = L.polygon(coords, {
-            color: '#888',      // jaśniejszy szary
+            color: '#800000',   // bordowy kolor granic
             fillColor: '#ccc',
             fillOpacity: 0,
-            weight: 3,          // delikatnie grubsze granice
-            interactive: false  // wyłącz kliknięcia i interakcje z polygonem
+            weight: 3,
+            interactive: true
           }).addTo(map);
 
-          // Żeby tooltip działał na hover mimo interactive: false, możemy dodać eventy na mapę:
-          poly.bindTooltip(() => {
-            const info = [`<strong>${id}</strong>`];
-            Object.entries(row).forEach(([k, v]) => {
-              if (!v) return;
-              const keyLower = k.toLowerCase();
-              if (keyLower === 'id') return;
-              if (keyLower.includes('polygon')) return;
-              info.push(`${k}: ${v}`);
-            });
-            return info.join('<br>');
-          }, { sticky: true });
+          const info = [`<strong>${id}</strong>`];
+          Object.entries(row).forEach(([k, v]) => {
+            if (!v) return;
+            const keyLower = k.toLowerCase();
+            if (keyLower === 'id') return;
+            if (keyLower.includes('polygon')) return;
+            info.push(`${k}: ${v}`);
+          });
+          poly.bindTooltip(info.join('<br>'), { sticky: true });
 
           poly.on('mouseover', () => {
             poly.setStyle({ fillOpacity: 0.5 });
