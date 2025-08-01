@@ -25,18 +25,39 @@
     fetch(CSV_URL)
       .then(r => r.text())
       .then(csv => {
-        const rows = Papa.parse(csv, { header: true }).data;
+        const parsed = Papa.parse(csv, { header: true });
+        const rows = parsed.data;
 
-        rows.forEach(row => {
+        console.log(`Wczytano ${rows.length} wierszy`);
+
+        rows.forEach((row, idx) => {
+          // loguj klucze aby sprawdzić nazwy kolumn
+          if (idx === 0) {
+            console.log('Kolumny:', Object.keys(row));
+          }
+
           const id = row.ID || row.id;
-          const raw = row.polygon;
-          if (!id || !raw) return;
+          const raw = row.polygon || row.Polygon || row.POLYGON;
+
+          if (!id) {
+            console.warn(`Wiersz ${idx} - brak ID, pomijam`);
+            return;
+          }
+          if (!raw) {
+            console.warn(`Wiersz ${idx} - brak polygon, pomijam`);
+            return;
+          }
 
           let coords;
           try {
-            coords = JSON.parse(raw).map(([x, y]) => [y, x]);
+            coords = JSON.parse(raw);
+            if (!Array.isArray(coords) || coords.length === 0) {
+              console.warn(`Wiersz ${idx} - polygon nie jest tablicą lub jest pusty`);
+              return;
+            }
+            coords = coords.map(([x, y]) => [y, x]);
           } catch(e) {
-            console.warn('Błąd parsowania polygonu dla ID:', id, e);
+            console.warn(`Wiersz ${idx} - błąd parsowania polygon:`, e);
             return;
           }
 
@@ -44,11 +65,13 @@
             color: '#333', fillColor: '#ccc', fillOpacity: 0.5
           }).addTo(map);
 
-          // Ukryj pola polygon i polygon_function w tooltipie
+          // W tooltip pomijaj wszystkie klucze zawierające "polygon" lub "polygon_function" (case insensitive)
           const info = [`<strong>${id}</strong>`];
-          Object.entries(row).forEach(([k,v]) => {
-            const key = k.toLowerCase();
-            if (key === "id" || key === "polygon" || key === "polygon_function") return;
+          Object.entries(row).forEach(([k, v]) => {
+            if (!v) return;
+            const keyLower = k.toLowerCase();
+            if (keyLower.includes('polygon')) return;
+            if (keyLower === 'id') return;
             info.push(`${k}: ${v}`);
           });
           poly.bindTooltip(info.join('<br>'), { sticky: true });
