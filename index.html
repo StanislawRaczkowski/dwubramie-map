@@ -2,62 +2,20 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Mapa Dwubramie</title>
+  <title>Mapa Dwubramie - test</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style> html, body, #map { height: 100%; margin: 0; } </style>
 </head>
 <body>
   <div id="map"></div>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script>
-    const W = 2000, H = 1500;  // rozmiar mapy i obrazka
+    const W = 2000, H = 1500;  
     const map = L.map('map', { crs: L.CRS.Simple, minZoom: -2 });
-    
-    // poprawiony overlay z właściwymi wymiarami
-    L.imageOverlay('Dwubramie.jpg', [[0, 0], [W, H]]).addTo(map);
-    map.fitBounds([[0, 0], [W, H]]);
 
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRANJvh0npIT9SY2a4yXEMvYrB0snebe2ZjwBJ58hKEEy-jwh04M7MR-cN60P_krDUEOiNvma9IaHxM/pub?output=csv";
-
-    fetch(CSV_URL)
-      .then(r => r.text())
-      .then(csv => {
-        console.log('CSV data loaded:', csv);
-        const rows = Papa.parse(csv, { header: true }).data.filter(r => r.polygon);
-        console.log('Parsed rows with polygons:', rows);
-        drawPolygons(rows);
-      })
-      .catch(e => console.error('Fetch error:', e));
-
-    function drawPolygons(rows) {
-      rows.forEach(row => {
-        const id = row.ID || row.id;
-        const raw = row.polygon;
-        if (!id || !raw) return;
-
-        let coords;
-        try { 
-          coords = JSON.parse(raw).map(([x, y]) => [y, x]); // Leaflet expects [lat, lng]
-          console.log(`Polygon coords for ${id}:`, coords);
-        }
-        catch (e) { 
-          console.warn(`Invalid polygon for id ${id}`, e);
-          return; 
-        }
-
-        const poly = L.polygon(coords, {
-          color: '#333', fillColor: '#ccc', fillOpacity: 0.5
-        }).addTo(map);
-
-        const info = [`<strong>${id}</strong>`];
-        Object.entries(row).forEach(([k, v]) => {
-          if (k.toLowerCase() === "id" || k.toLowerCase() === "polygon") return;
-          info.push(`${k}: ${v}`);
-        });
-        poly.bindTooltip(info.join('<br>'), { sticky: true });
-      });
-    }
+    // Poprawne wymiary - zamiana miejscami [y,x] w bounds
+    L.imageOverlay('Dwubramie.jpg', [[0,0],[H,W]]).addTo(map);
+    map.fitBounds([[0,0],[H,W]]);
   </script>
 </body>
 </html>
