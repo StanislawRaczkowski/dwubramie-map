@@ -16,7 +16,7 @@
     L.imageOverlay('Dwubramie.jpg', [[0,0],[H,W]]).addTo(map);
     map.fitBounds([[0,0],[H,W]]);
 
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbEmtPcluRdAkQRAlO8uaKvnTlBHBkN84fXf1YyVbK6kKopJfwPcZ_bkl8UhCz8KClvGVEkY1ady2a/pub?output=csv";
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRANJvh0npIT9SY2a4yXEMvYrB0snebe2ZjwBJ58hKEEy-jwh04M7MR-cN60P_krDUEOiNvma9IaHxM/pub?output=csv";
 
     fetch(CSV_URL)
       .then(r => r.text())
