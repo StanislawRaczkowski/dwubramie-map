@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Mapa Dwubramie - test</title>
+  <title>Mapa Dwubramie - test polygon</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style> html, body, #map { height: 100%; margin: 0; } </style>
 </head>
@@ -13,9 +13,24 @@
     const W = 2000, H = 1500;  
     const map = L.map('map', { crs: L.CRS.Simple, minZoom: -2 });
 
-    // Poprawne wymiary - zamiana miejscami [y,x] w bounds
     L.imageOverlay('Dwubramie.jpg', [[0,0],[H,W]]).addTo(map);
     map.fitBounds([[0,0],[H,W]]);
+
+    // Dodajemy polygon ręcznie
+    const polygonCoords = [
+      [500, 500],
+      [600, 500],
+      [600, 600],
+      [500, 600]
+    ];
+
+    const poly = L.polygon(polygonCoords, {
+      color: 'red',
+      fillColor: 'pink',
+      fillOpacity: 0.5
+    }).addTo(map);
+
+    poly.bindTooltip("Testowy polygon", {sticky: true});
   </script>
 </body>
 </html>
