@@ -17,7 +17,7 @@
   <script>
     const W = 2000, H = 1500;
     const map = L.map('map', { crs: L.CRS.Simple, minZoom: -2 });
-    L.imageOverlay('Dwubramie.jpg', [[0,0],[H,W]]).addTo(map);
+    L.imageOverlay('Dwubramie.svg', [[0,0],[H,W]]).addTo(map);
     map.fitBounds([[0,0],[H,W]]);
 
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRANJvh0npIT9SY2a4yXEMvYrB0snebe2ZjwBJ58hKEEy-jwh04M7MR-cN60P_krDUEOiNvma9IaHxM/pub?output=csv";
