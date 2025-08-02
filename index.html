@@ -79,7 +79,6 @@
         rows.forEach((row, idx) => {
           const id = row.ID || row.id;
           const raw = row.polygon || row.Polygon || row.POLYGON;
-
           if (!id || !raw) return;
 
           let coords = cleanPolygonString(raw);
@@ -87,8 +86,8 @@
 
           coords = coords.map(([x, y]) => [y, x]);
 
-          const name = row.Name || row.name || "";
-          const fillColor = factionColors[name] || "#ccc";
+          const controller = row.Controller || row.controller || "";
+          const fillColor = factionColors[controller] || "#ccc";
 
           const poly = L.polygon(coords, {
             color: '#800000',
