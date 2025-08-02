@@ -54,8 +54,7 @@
       }
     }
 
-    // ✅ POPRAWNY LINK do konkretnego arkusza: TabeleConv1.CSV
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRANJvh0npIT9SY2a4yXEMvYrB0snebe2ZjwBJ58hKEEy-jwh04M7MR-cN60P_krDUEOiNvma9IaHxM/gviz/tq?tqx=out:csv&sheet=TabeleConv1.csv";
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRANJvh0npIT9SY2a4yXEMvYrB0snebe2ZjwBJ58hKEEy-jwh04M7MR-cN60P_krDUEOiNvma9IaHxM/pub?output=csv";
 
     fetch(CSV_URL)
       .then(r => r.text())
@@ -75,7 +74,7 @@
           coords = coords.map(([x, y]) => [y, x]);
 
           const poly = L.polygon(coords, {
-            color: '#800000',
+            color: '#800000',   // bordowy kolor granic
             fillColor: '#ccc',
             fillOpacity: 0,
             weight: 3,
